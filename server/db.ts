@@ -1,18 +1,22 @@
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { eq, desc } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { InsertUser, users, articles, adminUsers, type Article, type InsertArticle, type AdminUser } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _client: ReturnType<typeof postgres> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _client = postgres(process.env.DATABASE_URL);
+      _db = drizzle(_client);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
+      _client = null;
     }
   }
   return _db;
@@ -68,7 +72,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    // For PostgreSQL, use INSERT ... ON CONFLICT
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
@@ -89,4 +95,85 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+/**
+ * Article queries
+ */
+export async function getArticles(limit?: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(articles).orderBy(desc(articles.publishedAt)) as any;
+  if (limit) query = query.limit(limit);
+  return query;
+}
+
+export async function getArticleBySlug(slug: string): Promise<Article | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(articles).where(eq(articles.slug, slug)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createArticle(data: InsertArticle): Promise<Article | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.insert(articles).values(data).returning();
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to create article:", error);
+    throw error;
+  }
+}
+
+export async function updateArticle(id: number, data: Partial<InsertArticle>): Promise<Article | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.update(articles).set(data).where(eq(articles.id, id)).returning();
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to update article:", error);
+    throw error;
+  }
+}
+
+export async function deleteArticle(id: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.delete(articles).where(eq(articles.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete article:", error);
+    throw error;
+  }
+}
+
+/**
+ * Admin user queries
+ */
+export async function getAdminUserByEmail(email: string): Promise<AdminUser | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(adminUsers).where(eq(adminUsers.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAdminUser(data: { email: string; passwordHash: string; name?: string }): Promise<AdminUser | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.insert(adminUsers).values(data).returning();
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to create admin user:", error);
+    throw error;
+  }
+}

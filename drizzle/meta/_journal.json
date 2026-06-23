@@ -1,5 +1,13 @@
 {
-  "version": "7",
-  "dialect": "mysql",
-  "entries": []
+  "version": "5",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1782193134274,
+      "tag": "0000_curved_falcon",
+      "breakpoints": true
+    }
+  ]
 }
