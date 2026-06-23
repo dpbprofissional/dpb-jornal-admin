@@ -1,0 +1,27 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "pnpm build"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "startCommand": "node dist/index.js",
+    "restartPolicyMaxRetries": 5,
+    "restartPolicyWindowMs": 60000
+  },
+  "variables": {
+    "DATABASE_URL": {
+      "description": "PostgreSQL Neon connection string",
+      "value": "postgresql://neondb_owner:npg_gfyQ8XOPlk2U@ep-blue-tree-ac25bi8m-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    },
+    "SESSION_SECRET": {
+      "description": "Secret key for session signing",
+      "value": "4e72526145dbfc18cfe25e43f899991988413043204913d1d054c869eac9c03f"
+    },
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production"
+    }
+  }
+}
