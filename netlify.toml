@@ -1,0 +1,19 @@
+[build]
+command = "pnpm build"
+publish = "dist/public"
+functions = "netlify/functions"
+
+[env.production]
+DATABASE_URL = "postgresql://neondb_owner:npg_gfyQ8XOPlk2U@ep-blue-tree-ac25bi8m-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+SESSION_SECRET = "4e72526145dbfc18cfe25e43f899991988413043204913d1d054c869eac9c03f"
+NODE_ENV = "production"
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/index:*"
+status = 200
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200

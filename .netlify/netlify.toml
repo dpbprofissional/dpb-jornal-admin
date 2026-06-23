@@ -1,0 +1,61 @@
+functionsDirectory = "/home/ubuntu/dpb-jornal-admin/netlify/functions"
+functionsDirectoryOrigin = "config-v1"
+redirectsOrigin = "config"
+plugins = []
+headers = []
+
+[build]
+publish = "/home/ubuntu/dpb-jornal-admin/dist/public"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "pnpm build"
+functions = "/home/ubuntu/dpb-jornal-admin/netlify/functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[env]
+
+[env.production]
+DATABASE_URL = "postgresql://neondb_owner:npg_gfyQ8XOPlk2U@ep-blue-tree-ac25bi8m-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+SESSION_SECRET = "4e72526145dbfc18cfe25e43f899991988413043204913d1d054c869eac9c03f"
+NODE_ENV = "production"
+
+[functions]
+
+[functions."*"]
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/index:*"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
