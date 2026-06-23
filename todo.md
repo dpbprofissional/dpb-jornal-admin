@@ -36,9 +36,15 @@
 - [x] Testar CRUD de artigos
 - [x] Testar proteção de rotas
 - [x] Testar frontend público com dados dinâmicos
-- [ ] Configurar variáveis de ambiente no Netlify
-- [ ] Fazer deploy no Netlify
-- [ ] Validar funcionamento em produção
+- [x] Configurar variáveis de ambiente no Netlify
+- [x] Fazer deploy no Netlify
+- [x] Validar funcionamento em produção
+
+## Fase 6: Deploy do Backend
+- [x] Preparar projeto para Railway
+- [x] Criar arquivo de instruções de deploy
+- [x] Documentar variáveis de ambiente
+- [x] Criar guia de setup completo
 
 ## Credenciais de Teste
 - Email: admin@dpbjornal.com
